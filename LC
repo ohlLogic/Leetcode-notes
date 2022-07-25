@@ -1,0 +1,2056 @@
+1.字符串
+1.1子串问题
+✨问题关键词：最长子串，回文串，公共前缀，最小覆盖子串
+✨算法关键词：滑动窗口， 中心扩展，动态规划
+//dp[i][j]表示字符串s[1,...i]和字符串t[1,...j]满足子序列的数量
+int[][] dp = new int[n + 1][m + 1];
+
+//初始化
+for(int i = 0; i <= n; i++) dp[i][0] = 1;
+
+//状态转移
+for(int i = 1; i <= n; i++)
+{
+    for(int j = 1; j <= m; j++)
+    {
+        if(s.charAt(i - 1) == t.charAt(j - 1)) dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];
+        else dp[i][j] = dp[i - 1][j];
+    }
+}
+return dp[n][m];
+● LC3 无重复字符的最长子串：滑动窗口
+● LC5 最长回文子串：中心扩展，区间dp
+● LC14 最长公共前缀：
+● LC 76 最长覆盖子串，滑动窗口统计词频
+● LC 115, 不同的子序列，动态规划，dp[i][j]表示字符串s[1,...i]和字符串t[1,...j]满足子序列的数量
+1.2转换问题
+✨问题关键词：字符串转整数，罗马数字
+✨算法关键词：进制模拟，贪心
+● LC8 字符串转整数
+● LC12 整数转罗马数字
+● LC 13 罗马数字转整数
+1.3匹配问题
+✨问题关键词：表达式匹配
+✨算法关键词：动态规划，KMP，滑动窗口，哈希表
+//next数组
+getNext(int[] next, String p)
+{
+    for(int i = 1, j = 0; i < p.length(); i++)
+    {
+        while(j > 0 && p.charAt(i) != p.charAt(j)) j = next[j - 1];
+        if(p.charAt(i) == p.charAt(j)) j++;
+        next[i] = j;
+    }
+}
+
+//匹配
+for(int i = 0, j = 0; i < s.length(); i++)
+{
+    while(j > 0 && s.charAt(i) != p.charAt(j)) j = next[j - 1];
+    if(s.charAt(i) == p.charAt(j)) j++;
+    if(j == n) return i - n + 1;
+}
+public int minDistance(String word1, String word2) {
+    int n = word1.length(), m = word2.length();
+    int[][] dp = new int[n + 1][m + 1];
+
+    //初始化
+    for(int i = 1; i <= n; i++) dp[i][0] = i;
+    for(int j = 1; j <= m; j++) dp[0][j] = j;
+
+    //状态转移
+    for(int i = 1; i <= n; i++)
+    {
+        for(int j = 1; j <= m; j++)
+        {
+            if(word1.charAt(i - 1) == word2.charAt(j - 1)) dp[i][j] = dp[i - 1][j - 1];
+            else dp[i][j] = Math.min(Math.min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
+        }
+    }
+    return dp[n][m];
+}
+● LC10 正则表达式匹配，动态规划
+● LC28 实现strStr（），KMP
+● LC30 串联所有单词的子串，滑动窗口，哈希表
+● LC 44 通配符，动态规划
+● LC 72 编辑距离，动态规划
+● LC 97交错字符串，动态规划dp[i][j]表示s3的前i + j个字符能否由s1[1~i]和s2[1~j]构成
+2.贪心
+● LC11 盛最多水的容器，移动高度较小的指针
+● LC12 整数转罗马数字，每次选择较大的数字
+● LC55 跳跃游戏，记录最远能够到达的地方
+● LC45 跳跃游戏2，每次在上次最大边界end选择一个最远的地方
+
+3.双指针
+问题关键字：多数之和
+● LC15 三数之和， 排序 + 双指针
+● LC16 最接近的三数之和，排序 + 双指针
+● LC18 四数之和， 排序 + 双指针
+
+4.链表
+算法关键字：快慢指针，头结点，优先队列
+//找到某个链表的中间节点 right一般为null，也可以指定节点
+public ListNode getMid(ListNode left, ListNode right)
+{
+    ListNode fast = left, slow = left;
+    while(fast != right && fast.next != right)
+    {
+        fast = fast.next.next;
+        slow = slow.next;
+    }
+    return slow;
+}
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        ListNode p = head, q = head;
+        while(p != null && p.next != null)
+        {
+            p = p.next.next;
+            q = q.next;
+            if(p == q) return true;
+        }
+        return false;
+    }
+}
+public ListNode sortList(ListNode head) {
+    // 归并排序
+    if(head == null || head.next == null) return head;
+
+    // 中点
+    ListNode fast = head, slow = head, prev = head;
+    while(fast != null && fast.next != null)
+    {
+        prev = slow;
+        fast = fast.next.next;
+        slow = slow.next;
+    }
+
+    prev.next = null;
+
+    ListNode hh = head, ss = slow;
+
+    // 递归
+    ListNode l = sortList(hh), r = sortList(ss);
+
+    // 合并
+    ListNode dummy = new ListNode(-1);
+    ListNode cur = dummy;
+
+    while(l != null && r != null)
+    {
+        if(l.val <= r.val)
+        {
+            cur.next = l;
+            cur = cur.next;
+            l = l.next;
+        }
+        else{
+            cur.next = r;
+            cur = cur.next;
+            r = r.next;
+        }
+    }
+    if(l != null) cur.next = l;
+    if(r != null) cur.next = r;
+    return dummy.next;
+}
+● LC19 删除链表的倒数的第N个节点，快慢指针，头结点
+● LC23 合并K个升序链表，优先队列
+● LC25 K个一组反转链表
+● LC 141 环形链表，快慢指针
+● LC 148 链表排序，归并排序
+
+5.DFS
+问题关键字：所有组合，所有排列，棋盘&数独
+算法关键字：显示回溯，隐式回溯
+    public void dfs(int idx, int sum)
+    {
+        if(sum == target){
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        if(idx == n || sum > target) return;
+
+        //枚举当前idx个数i
+        for(int i = 0; num[idx] * i <= target; i++)
+        {
+            sum += num[idx] * i;
+            for(int j = i; j > 0; j--) list.add(num[idx]);
+            dfs(idx + 1, sum);
+            //回溯
+            sum -= num[idx] * i;
+            for(int j = i; j > 0; j--) list.remove(list.size() - 1);
+        }
+    }
+Arrays.sort(num);
+Set<List<Integer>> ans = new ArrayList<>();
+List<Integer> list = new ArrayList<>();
+return new ArrayList<>(ans);
+
+//某些数据会被TLE
+public void dfs(int idx, int sum)
+    {
+        if(sum == target)
+        {
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+
+        if(idx == n || sum > target) return;
+
+        //选取idx
+        list.add(num[idx]);
+        dfs(idx + 1, sum + num[idx]);
+        list.remove(list.size() - 1);
+        //不选取idx
+        dfs(idx + 1, sum);
+}
+
+    public void dfs1(int[] tt, int t, int u, boolean[] flag)
+    {
+        if(sum == t)
+        {
+            lists.add(new ArrayList<>(d));
+            return;
+        }
+
+        for(int i = u; i < tt.length && tt[i] + sum <= t; i++)
+        {
+            //同层的第一个节点已经被访问过，直接跳过
+            if(i > 0 && tt[i] == tt[i - 1] && !flag[i - 1]) continue;
+
+            flag[i] = true;
+            sum += tt[i];
+            d.push(tt[i]);
+            dfs1(tt, t, i + 1, flag);
+            sum -= tt[i];
+            flag[i] = false;
+            d.poll();
+        }
+    }
+
+//剪枝DFS
+  public void dfs(int u, boolean[] flag, int sum)
+    {
+        if(sum == target)
+        {
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+
+        for(int i = u; i < n && num[i] + sum <= target; i++)
+        {
+            //同层的第一个节点已经被访问过，直接跳过
+            if(i > 0 && num[i] == num[i - 1] && !flag[i - 1]) continue;
+
+            flag[i] = true;
+            sum += num[i];
+            list.add(num[i]);
+            dfs(i + 1, flag, sum);
+            sum -= num[i];
+            flag[i] = false;
+            list.remove(list.size() - 1);
+        }
+    }
+int[] nums;
+List<List<Integer>> ans = new ArrayList<>();
+List<Integer> list = new ArrayList<>();
+void dfs()
+{
+    if(list.size() == n) ans.add(new ArrayList<>(list));
+    
+    for(int i = 0; i < n; i++)
+    {
+        if(flag[i]) continue;
+        flag[i] = true;
+        list.add(nums[i]);
+        dfs();
+        list.remove(list.size() - 1);
+        flag[i] = false;
+    }
+}
+    public void dfs(int[] nums)
+    {
+        if(list.size() == n)
+        {
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+
+        for(int i = 0; i < n; i++)
+        {
+            //剪枝
+            if(i > 0 && nums[i] == nums[i - 1] && !flag[i - 1]) continue;
+            if(flag[i]) continue;
+            list.add(nums[i]);
+            flag[i] = true;
+            dfs(nums);
+            list.remove(list.size() - 1);
+            flag[i] = false;
+        }
+    }
+
+public void dfs(int[] nums, int u)
+{
+    ans.add(new ArrayList<>(list));
+    if(u == nums.length) return;
+
+    for (int i = u; i < nums.length; i++) {
+        list.add(nums[i]);
+        dfs(nums, i + 1);
+        list.remove(list.size() - 1);
+    }
+}
+● LC17 电话号码的字母组合，DFS
+● LC 22 括号生成，DFS
+● LC37 解数独，DFS
+● LC39 组合总数，DFS
+● LC 46 全排列，DFS
+● LC 51 N皇后, DFS（每行遍历，正对称，负对称坐标映射）
+● LC 77 组合，DFS
+● LC 78 子集，DFS
+● LC 79 单词搜索，DFS（数组）
+6.BFS
+问题关键词：单词接龙
+public int bfs()
+{
+    //d1代表从起点beginword开始搜索（正向）
+    //d2代表从终点endword开始搜索（反向）
+    Deque<String> d1 = new ArrayDeque<>(), d2 = new ArrayDeque<>();
+
+    //创建对应的哈希表，key-value：代表从开始到当前单词的转换次数
+    Map<String, Integer> m1 = new HashMap<>(), m2 = new HashMap<>();
+
+    d1.add(s);
+    m1.put(s, 0);
+    d2.add(e);
+    m2.put(e, 0);
+
+    //双向bfs过程，当两个队列不为空才有搜索的必要
+    while(!d1.isEmpty() && !d2.isEmpty())
+    {
+        int t = -1;
+        if(d1.size() <= d2.size()) t = update(d1, m1, m2);
+        else t = update(d2, m2, m1);
+        if(t != -1) return t;
+    }
+    return -1;
+}
+
+public int update(Deque<String> d, Map<String, Integer> cur, Map<String, Integer> other)
+{
+    int len = d.size();
+    while(len-- > 0)
+    {
+        //获取当前需要扩展的字符串
+        String poll = d.pollFirst();
+        int n = poll.length();
+
+        //枚举替换原字符串的哪个字符i
+        for(int i = 0; i < n; i++)
+        {
+            //枚举i的替换的小写字母
+            for(int j = 0; j < 26; j++)
+            {
+                //替换后的字符串
+                String sub = poll.substring(0, i) + String.valueOf((char) ('a' + j)) + poll.substring(i + 1);
+                //在set中如果有替换后字符串sub
+                if(set.contains(sub))
+                {
+                    //如果当前字符串sub在哈希表已经被记录过，则跳过
+                    if(cur.containsKey(sub)) continue;
+
+                    //如果当前字符串在另一个方向被记录，说明找到了两个方向的最短路
+                    if(other.containsKey(sub)) return cur.get(poll) + 1 + other.get(sub);
+                    else{
+                        //否则加入队列d
+                        d.addLast(sub);
+                        cur.put(sub, cur.get(poll) + 1);
+                    }
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+● LC 127 单词接龙，双向BFS
+
+7.运算&进制
+问题关键词：四则运算
+算法关键词：快速乘法，高精度
+//a * k
+long Mul(long a, long k)
+{
+    long ans = 0;
+    while(k > 0)
+    {
+        if((k & 1) == 1) ans += a;
+        k >>= 1;
+        a += a;
+    }
+    return ans;
+}
+
+//a ^ k
+public double mul(double x, long N)
+{
+    double ans = 1.0;
+    while(N > 0)
+    {
+        if((N & 1) == 1) ans *= x;
+        N >>= 1;
+        x *= x;
+    }
+    return ans;
+}
+● LC29，两数相除，快速乘法
+● LC 50，Pow(x,n)，快速幂
+
+8.数组
+问题关键词：选择数组，数独，缺失的第一个正数，最大子数组和，螺旋矩阵，跳跃游戏，区间，荷兰国旗（颜色分类），最大矩形，买卖股票，最长连续序列
+算法关键词：二分，坐标映射，DFS，哈希，动态规划，区间合并，扫描线，双指针，并查集
+int l = 0, r = n - 1;
+//向下取整，寻找第一个target
+while(l < r)
+{
+    int mid = l + r >> 1;
+    if(check(mid)) r = mid;
+    else l = mid + 1;
+}
+
+
+//向上取整，寻找最后一个target
+while(l < r)
+{
+    int mid = l + r + 1 >> 1;
+    if(check(mid)) l = mid;
+    else r = mid - 1;
+}
+//一维转二维映射idx->(x, y)
+x = idx / m, y = idx % m;
+
+//二维转一维映射(x,y)->idx
+idx = x * m + y;
+
+//数组box映射
+boxIdx = (i / 3) * 3 + j / 3;
+    public boolean dfs(char[][] board, int x, int y)
+    {
+        //每层最后一个处理完，跳到下一层
+        if(y == 9) return dfs(board, x + 1, 0);
+        //出口
+        if(x == 9) return true;
+        if(board[x][y] != '.') return dfs(board, x, y + 1);
+
+        //处理'.'
+        for(int i = 0; i < 9; i++)
+        {
+            int boxIdx = (x / 3) * 3 + y / 3;
+            if(!row[x][i] && !col[y][i] && ! box[boxIdx][i])
+            {
+                board[x][y] = (char) (i + '1');
+                row[x][i] = col[y][i] = box[boxIdx][i] = true;
+                if(dfs(board, x, y + 1)) break;
+                else{
+                    //回溯
+                    board[x][y] = '.';
+                    row[x][i] = col[y][i] = box[boxIdx][i] = false;
+                }
+            }
+        }
+        return board[x][y] != '.';
+    }
+        //如果不缺少整数 nums[i] = nums[nums[i] - 1]
+        for(int i = 0; i < n; i++)
+        {
+            while(nums[i] > 0 && nums[i] <= n && nums[i] != nums[nums[i] - 1]) swap(nums, i, nums[i] - 1);
+        }
+int[][] dirs = new int[][]{{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+int x = 0, y = 0;
+int dirsIdx = 0;
+
+for(int i = 0; i < n * m; i++)
+{
+    int nx = x + dirs[dirsIdx][0], ny = y + dirs[dirsIdx][1];
+    if(nx < 0 || nx >= n || ny < 0 || ny >= m || vis[nx][ny]) dirsIdx = (dirsIdx + 1） % 4；
+                                                                         }
+                                                                    
+Arrays.sort(intervals, (x, y) -> x[0] - y[0]);
+
+int n = intervals.length;
+int[][] ans = new int[n][2];
+int idx = -1;
+for(int[] cur : intervals)
+{
+    //如果是第一个或者当一个区间右边界小于当前区间左边界，放入ans
+    if(idx == -1 || ans[idx][1] < cur[0]) ans[++idx] = cur;
+    else ans[idx][1] = Math.max(ans[idx][1], cur[1]); //与当前区间右比较
+}
+return Arrays.copyOf(ans, idx + 1);
+for(int[] cur : intervals)
+{
+    if(newInterval == null || cur[1] < newInterval[0]) ans.add(cur);
+    else if(newInterval[1] < cur[0])
+    {
+        ans.add(newInterval);
+        ans.add(cur);
+        newInterval = null;
+    }
+    else{
+        newInterval[0] = Math.min(newInterval[0], cur[0]);
+        newInterval[1] = Math.max(newInterval[1], cur[1]);
+    }
+}
+if(newInterval != null) ans.add(newInterval);
+        //从上到下统计连续1的个数
+        for(int i = 0; i < m; i++)
+        {
+            if(matrix[0][i] == '1') mat[0][i] = 1;
+        }
+        for(int i = 1; i < n; i++)
+        {
+            for(int j = 0; j < m; j++)
+            {
+                if(matrix[i][j] == '1') mat[i][j] = mat[i - 1][j] + 1;
+            }
+        }
+
+        int ans = 0;
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < m; j++)
+            {
+                //剪枝，假设当前层所有都为1
+                if(mat[i][j] * m <= ans) continue;
+                int cnt = 1;
+                //向右找到>=当前位置
+                for(int k = j + 1; k < m; k++)
+                {
+                    if(mat[i][k] < mat[i][j]) break;
+                    cnt++;
+                }
+                //向左
+                for(int k = j - 1; k >= 0; k--)
+                {
+                    if(mat[i][k] < mat[i][j]) break;
+                    cnt++;
+                }
+                ans = Math.max(ans, cnt * mat[i][j]);
+            }
+        }
+        return ans;
+//并查集
+class UF{
+    int n;
+    int[] parent, size;
+    public UF(int n)
+    {
+        //初始化
+        this.n = n;
+        this.parent = new int[n];
+        this.size = new int[n];
+        for(int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+
+    //union
+    public void union(int a, int b)
+    {
+        int rootA = find(a), rootB = find(b);
+        parent[rootA] = parent[rootB];
+        size[rootB] += size[rootA];
+    }
+
+    //find
+    public int find(int x)
+    {
+        if(parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    //query
+    public boolean query(int a, int b)
+    {
+        return parent[a] == parent[b];
+    }
+
+    //max
+    public int getMax()
+    {
+        int ans = 0;
+        for(int i = 0; i < n; i++)
+        {
+            if(i == parent[i]) ans = Math.max(ans, size[i]);
+        }
+        return ans;
+    }
+}
+● LC33 搜索选择排序数组， 二分
+● LC34 在排序数组查找元素的第一个位置和最后一个位置，二分
+● LC36 有效的数独，坐标映射
+● LC37 解数独，DFS
+● LC 41 缺失的第一个正数，哈希
+● LC 53 最大子数组和，动态规划
+● LC 54 螺旋矩阵，方向模拟
+● LC 55 跳跃游戏，贪心（最远能够到达的地方），动态规划
+● LC 56 合并区间，排序
+● LC 57 插入区间，扫描线
+● LC 75 颜色分类，双指针
+● LC 121 买卖股票的最佳时机1，贪心，动态规划
+● LC 122 买卖股票的最佳时机2，贪心，动态规划（dp[i][0]表示第i天没有股票的收益，dp[i][1]表示第i天有股票的收益）
+● LC 123 买卖股票的最佳时机3，动态规划（dp[i][j][k]表示第i天，j（0,1）表示是否持有股票，k卖出的股票数  收益)
+● LC 128 最长连续序列，并查集
+
+9.单调栈
+算法关键字：单调递增栈：找到最近比其小的值，单调递减栈：找到最近比其大的值
+//栈内元素递减，找到最近比其大的值
+for(int i = 0; i < n; i++)
+{
+    while(!d.isEmpty() && height[i] > height[d.peekLast()])
+    {
+        int cur = d.pollLast();
+        int left = d.peekLast(), right = i;
+        }
+    d.addLast(i);
+}
+//添加哨兵0, 0
+int[] arr;
+for(int i = 0; i < n; i++)
+{
+    while(!d.isEmpty() && arr[i] < arr[d.peekLast()])
+    {
+        int cur = d.pollLast();
+        int left = d.peekLast(), right = i;
+    }
+    d.addLast(i);
+}
+
+● LC42 接雨水，单调递减栈
+● LC84 柱状图中最大的矩形，单调递增栈
+● LC85 最大矩阵，从上到下统计连续1个数，每层使用单调递减栈
+
+10.二叉树
+问题关键词：遍历，相似的树，深度，构造，序列化&反序列化
+算法关键词：dfs，bfs，迭代
+
+//迭代
+Deque<TreeNode> d = new ArrayDeque<>();
+d.addLast(root);
+
+//可变形为N叉树
+while(!d.isEmpty())
+{
+    TreeNode poll = d.pollLast();
+    ans.add(poll.val);
+    //从右到左加入该节点子节点
+    if(poll.right != null) d.addLast(poll.right);
+    if(poll.left != null) d.addLast(poll.left);
+}
+
+//
+List<Integer> ans = new ArrayList<>();
+Deque<TreeNode> d = new ArrayDeque<>();
+
+while(!d.isEmpty() || root != null)
+{
+    while(root != null)
+    {
+        ans.add(root.val);
+        d.addLast(root);
+        root = root.left;
+    }
+
+    root = d.pollLast();
+
+    root = root.right;
+}
+return ans;
+//迭代
+Deque<TreeNode> d = new ArrayDeque<>();
+while(!d.isEmpty() || root != null)
+{
+    //不断将左子树入栈
+    while(root != null)
+    {
+        d.addLast(root);
+        root = root.left;
+    }
+    
+    //出栈顶元素
+    root = d.pollLast();
+    ans.add(root.val);
+    
+    //root右子树
+    root = root.right
+    }
+
+}
+// 前序:根右左 ->翻转
+public List<Integer> postorderTraversal(TreeNode root) {
+    List<Integer> ans = new ArrayList<>();
+    Deque<TreeNode> d = new ArrayDeque<>();
+
+    while(!d.isEmpty() || root != null)
+    {
+        while(root != null)
+        {
+            ans.add(root.val);
+            d.addLast(root);
+            root = root.right;
+        }
+
+        root = d.pollLast();
+        root = root.left;
+    }
+
+    Collections.reverse(ans);
+    return ans;
+}
+public boolean dfs(TreeNode p, TreeNode q)
+{
+    if(p == null && q == null) return true;
+    if(p == null || q == null) return false;
+    
+    boolean left = dfs(p.left, q.left), right = dfs(p.right, q.right);
+    return p.val == q.val && left && right;
+    }
+//dfs定义上下界[lower, higher]判断当前root是否在上下界中
+public boolean dfs(TreeNode root, long lower, long higher)
+{
+    if(root == null) return true;
+
+    if(root.val <= lower || root.val >= higher) return false;
+    return dfs(root.left, lower, root.val) && dfs(root.right, root.val, higher);
+}
+public List<TreeNode> dfs(int start, int end)
+{
+    List<TreeNode> allTree = new ArrayList<>();
+    if(start > end)
+    {
+        allTree.add(null);
+        return allTree;
+    }
+
+    //枚举节点作为根节点
+    for(int i = start; i <= end; i++)
+    {
+        List<TreeNode> leftTree = dfs(start, i - 1);
+        List<TreeNode> rightTree = dfs(i + 1, end);
+
+        for(TreeNode ll : leftTree)
+        {
+            for(TreeNode rr : rightTree)
+            {
+                TreeNode cur = new TreeNode(i);
+                cur.left = ll; cur.right = rr;
+                allTree.add(cur);
+            }
+        }
+    }
+    return allTree;
+}
+public int dfs(TreeNode root)
+{
+    if(root == null) return 0;
+    return Math.max(dfs(root.left), dfs(root.right)) + 1;
+}
+//左闭右开区间[)
+public TreeNode dfs(int[] preorder, int preleft, int preright, int[] inorder, int inleft, int inright)
+{
+    if(inright - inleft < 1) return null;
+    if(inright - inleft == 1) return new TreeNode(inorder[inleft]);
+    
+    //根据前序遍历inleft构造根节点
+    int val = preorder[inleft];
+    TreeNode root = new TreeNode(val);
+    
+    //根据中序遍历找到root的下标
+    int rootIdx = 0;
+    for(int i = inleft; i < inright; i++)
+    {
+        if(inorder[i] == val)
+        {
+            rootIdx = i;
+            break;
+        }
+    }
+    
+    root.left = dfs(preorder, preleft + 1, preleft + (rootIdx - inleft), inorder, inleft, rootIdx);
+    root.right = dfs(preorder, preleft + (rootIdx - inleft) + 1, preright, inorder, rootIdx + 1, inright);
+    return root;
+}
+    
+//左闭右开[)
+public void dfs(int[] postorder, int postleft, int postright, int[] inorder, int inleft, int inright)
+{
+    if(inright - inleft < 1) return null;
+    if(inright - inleft == 1) return new TreeNode(inorder[inleft]);
+    
+    //根据后序遍历取得根节点
+    int val = postorder[postright - 1];
+    TreeNode root = new TreeNode(val);
+    
+    //根据中序遍历找到root下标
+    int rootIdx = 0;
+    for(int i = inleft; i < inright; i++)
+    {
+        if(inorder[i] == val)
+        {
+            rootIdx = i;
+            break;
+        }
+    }
+    
+    root.left = dfs(postorder, postleft, (rootIdx - inleft) + postleft, inorder, inleft, rootIdx);
+    root.right = dfs(postorder, (rootIdx - inleft) + postleft, postright - 1, inorder, rootIdx + 1, inright);
+    return root;
+}
+
+//标记0为空，如果子树已经为不平衡return-1，自底向上传递
+public int dfs(TreeNode root)
+{
+    if(root == null) return 0;
+    int left = dfs(root.left), right = dfs(root.right);
+    if(left == -1 || right == -1 || Math.abs(left - right) > 1) return -1;
+    return Math.max(left, right) + 1;
+}
+List<List<Integer>> ans = new ArrayList<>();
+List<Integer> list = new ArrayList<>();
+public void dfs(TreeNode root, int target)
+{
+    if(root == null) return;
+    if(root.left == null && root.right == null)
+    {
+        if(root.val == target)
+        {
+            list.add(root.val);
+            ans.add(new ArrayList<>(list));
+            list.remove(list.size()  - 1);
+            return;
+        }
+    }
+
+    list.add(root.val);
+    dfs(root.left, target - root.val);
+    list.remove(list.size() - 1);
+
+    list.add(root.val);
+    dfs(root.right, target - root.val);
+    list.remove(list.size() - 1);   
+}
+//序列化的二叉树不是满二叉树
+TreeNode tmp = new TreeNode(-10000);
+List<String> list = new ArrayList<>();
+// Encodes a tree to a single string.
+public String serialize(TreeNode root) {
+    Deque<TreeNode> d = new ArrayDeque<>();
+    if(root == null) return "";
+    d.addLast(root);
+
+    //bfs
+    while(!d.isEmpty())
+    {
+        TreeNode cur = d.pollFirst();
+        list.add(cur.val + "");
+        if(!cur.equals(tmp))
+        {
+            if(cur.left != null) d.addLast(cur.left);
+            else d.addLast(tmp);
+            if(cur.right != null) d.addLast(cur.right);
+            else d.addLast(tmp);
+        }
+
+    }
+    return String.join(",", list);
+}
+
+// Decodes your encoded data to tree.
+public TreeNode deserialize(String data) {
+    //build tree
+    if(data.equals("")) return null;
+    String[] ss = data.split(",");
+    int n = ss.length;
+    TreeNode root = new TreeNode(Integer.parseInt(ss[0]));
+    Deque<TreeNode> d = new ArrayDeque<>();
+    d.addLast(root);
+
+    for(int i = 1; i < n - 1; i += 2)
+    {
+        TreeNode poll = d.pollFirst();
+        int a = Integer.parseInt(ss[i]), b = Integer.parseInt(ss[i + 1]);
+        if(a != -10000)
+        {
+            poll.left = new TreeNode(a);
+            d.addLast(poll.left);
+        }
+        if(b != -10000)
+        {
+            poll.right = new TreeNode(b);
+            d.addLast(poll.right);
+        }
+    }
+    return root; 
+}
+
+//序列化的二叉树是满二叉树
+public TreeNode(int[] nums, int i)
+{
+    if(i > nums.length - 1 || nums[i] == emptyNode.val) return null;
+    TreeNode root = new TreeNode(nums[i]);
+    root.left = dfs(nums, 2 * i + 1);
+    root.right = dfs(nums, 2 * 2 + 2);
+    return root;
+}
+int ans = Integer.MIN_VALUE;
+public int dfs(TreeNode root)
+{
+    if(root == null) return 0;
+
+    //负值直接舍去
+    int leftmax = Math.max(0, dfs(root.left));
+    int rightmax = Math.max(0, dfs(root.right));
+
+    //每个节点上判断是否是最大值，可能子树root为当前最大值ans
+    ans = Math.max(ans, leftmax + rightmax + root.val);
+
+    //左子树和右子树最大的长度，因为当前子树根节点root不能重复取两次
+    return Math.max(leftmax, rightmax) + root.val;
+}
+
+
+//带返回路径的二叉树最大路径和
+Pair ans = new Pair(Integer.MIN_VALUE, new ArrayList<>());
+public int maxPathSum(TreeNode root)
+{
+	dfs(root);
+	return ans.sum;
+}
+
+public Pair dfs(TreeNode root)
+{
+	Pair cur = new Pair(0, new ArrayList<>());
+	if(root == null) return cur;
+	
+	Pair left = dfs(root.left), right = dfs(root.right);
+	if(left.sum <= 0) left = new Pair(0, new ArrayList<>());
+	if(right.sum <= 0) right = new Pair(0, new ArrayList<>());
+	
+	int curSum = root.val + left.sum + right.sum;
+	
+	//更新
+	if(ans.sum < curSum)
+	{
+		List<Integer> curPath = new ArrayList<>();
+		curPath.addAll(left.path);
+		curPath.add(root.val);
+		curPath.addAll(right.path);
+		ans = new Pair(curSum, curPath);
+	}
+	
+	if(left.sum >= right.sum)
+	{
+		cur.path.addAll(left.path);
+		cur.add(root.val);
+		cur.sum = root.val + right.sum;
+	}
+	else{
+		cur.path.addAll(root.val);
+		cur.path.addAll(right.path);
+		cur.sum = root.val + right.sum;
+	}
+	return cur;
+	
+}
+
+class Pair{
+	int sum;
+	List<Integer> path;
+	public Pair(int sum, List<Integer> path)
+	{
+		this.sum = sum;
+		this.path = path;
+	}
+}
+
+class Trie{
+	class TrieNode{
+		boolean end;
+		TrieNode[] tns = new TrieNode[26];
+	}
+	
+	TrieNode root;
+	public Trie(){
+		root = new TrieNode();
+	}
+	
+	// 插入
+	public void insert(String s)
+	{
+		TrieNode p = root;
+		for(int i = 0; i < s.length(); i++)
+		{
+			int u = s.charAt(i) - 'a';
+			if(p.tns[u] == null) p.tns[u] = new TrieNode();
+			p = p.tns[u];
+		}
+		p.end = true;
+	}
+	
+	// 搜索
+	public boolean search(String s)
+	{
+		TrieNode p = root;
+		for(int i = 0; i < s.length(); i++)
+		{
+			int u = s.charAt(i) - 'a';
+			if(p.tns[u] == null) return false;
+			p = p.tns[u];
+		}
+		return p.end;
+	}
+	
+	// 是否以S字符串开头
+	public boolean startsWith(String s)
+	{
+		TrieNode p = root;
+		for(int i = 0; i < s.length(); i++)
+		{
+			int u = s.charAt(i) - 'a';
+			if(p.tns[u] == null) return false;
+			p = p.tns[u];
+		}
+		return true;
+	}
+}
+class Solution {
+    TreeNode ans = null;
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        dfs(root, p, q);
+        return ans;
+    }
+
+    // 二进制表示状态00, 10, 01, 11
+    public int dfs(TreeNode root, TreeNode p, TreeNode q)
+    {
+        if(root == null) return 0;
+        int state = dfs(root.left, p, q);
+        if(root == p) state |= 1;
+        else if(root == q) state |= 2;
+        state |= dfs(root.right, p, q);
+        if(state == 3 && ans == null) ans = root;
+        return state;
+    }
+}
+● LC 98 验证二叉搜索树，bfs，dfs
+● LC 99恢复二叉搜索树，中序
+● LC 100相同的树，dfs判断两棵树是否相等
+● LC 95 不同的二叉搜索树2， dfs
+● LC 101 对称二叉树，dfs(root, root)类似LC100
+● LC 104 二叉树的最大深度，dfs
+● LC 105 前序与中序遍历序列构造二叉树， dfs
+● LC 110平衡二叉树， dfs
+● LC 112 路径总和，dfs（从根节点到叶节点）判断是否有路径
+● LC 113 路径总和2， dfs（从根节点到叶节点）判断是否有路径，输出路径
+● LC 297 序列化和反序列化二叉树，bfs
+● LC 124 二叉树的最大路径和，dfs
+● LC 236 二叉树公共祖先，LCA dfs
+
+11.图论
+//适用于稠密图，边数量接近点数量平方
+int[][] w = new int[N][N];
+
+//加边 a->b 权重为c
+void add(int a, int b, int c)
+{
+    w[a][b] = c;
+}
+/**
+    idx表示边编号，初始从0开始
+    he数组表示某个节点边集合（链表）的头结点，初始化为-1
+    e数组表示边指向的节点，e[idx]表示idx边指向节点
+    ne数组表示找到下一条边
+    w数组表示某条边权重，w[idx]表示idx边权重
+*/
+int[] he = new int[N], e = new int[M], ne = new int[M], w = new int[M];
+int idx;
+
+//加边 a->b 权重为c
+void add(int a, int b, int c)
+{
+    e[idx] = b;
+    ne[idx] = he[a];
+    w[idx] = c;
+    he[a] = idx++;
+}
+
+//遍历从a出发的边
+for(int i = he[a]; i != -1; i = ne[i])
+{
+    int b = e[i], c = w[i]; //a->b 权重为c
+}
+
+//需要确定某个操作复杂度为O(m)才用class
+class Edge{
+    int a, b, c;
+    Edge(int _a, int _b, int _c)
+    {
+        a = _a; b = _b; c = _c;
+    }
+}
+
+//遍历所有边
+List<Edge> es = new ArrayList<>();
+for(Edge e : es){
+    xxx
+    }
+int[][] w = new int[N][N];
+int INF = 0x3f3f3f3f;
+//初始化
+for(int i = 1; i <= n; i++)
+{
+    for(int j = i; j <= n; j++)
+    {
+        w[i][j] = w[j][i] = i == j ? 0 : INF;
+    }
+}
+
+//存图
+for(int[] t : ts)
+{
+    int a = t[0], b = t[1], c = t[2];
+    w[a][b] = c;
+}
+
+//floyd()
+//w[a][b]表示a到b的最短距离
+//枚举中转点k，枚举起点-终点
+for(int k = 1; k <= n; k++)
+{
+    for(int i = 1; i <= n; i++)
+    {
+        for(int j = 1; j <= n; j++)
+        {
+            w[i][j] = Math.min(w[i][j], w[i][k] + w[k][j])
+            }
+    }
+}
+int[][] w = new int[N][N];
+boolean[] vis = new boolean[N]; //记录是否访问过
+int[] dist = new int[N]; //源点到终点的距离
+int INF = 0x3f3f3f3f;
+//初始化
+for(int i = 1; i <= n; i++)
+{
+    for(int j = i; j <= n; j++)
+    {
+        w[i][j] = w[j][i] = i == j ? 0 : INF;
+    }
+}
+
+//Dijkstra
+void dijkstra()
+{
+    Arrays.fill(vis, false);
+    Arrays.fill(dist, INF);
+    //起点k最短距离为0
+    dist[k] = 0;
+    //迭代n次
+    for(int p = 1; p <= n; p++)
+    {
+        //每次找到最短距离最小且未被更新的点t
+        int t = -1;
+        for(int i = 1; i <= n; i++)
+        {
+            if(!vis[i] && (t == -1 || dist[i] < dist[t])) t = i;
+        }
+        //标记t更新
+        vis[t] = true;
+        //用t的最小距离更新其他点
+        for(int i = 1; i <= n; i++)
+        {
+            dist[i] = Math.min(dist[i], dist[t] + w[t][i]);
+        }
+    }
+}
+int[] he = new int[N], e = new int[M], ne = new int[M], w = new int[M];
+int idx;
+int[] dist = new int[N];
+boolean[] vis = new boolean[N];
+void add(int a, int b, int c)
+{
+    e[idx] = b;
+    ne[idx] = he[a];
+    w[idx] = c;
+    he[a] = idx++;
+}
+
+//Dijkstra
+void dijkstra()
+{
+    Arrays.fill(vis, flase);
+    Arrays.fill(dist, INF);
+    dist[k] = 0;
+    //使用优先队列更新所有可用于更新的点,优先弹出最短距离较小的点
+    PriorityQueue<int[]> q = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+    q.add(new int[]{k, 0});
+    
+    while(!q.isEmpty())
+    {
+        int[] poll = q.poll();
+        int id = poll[0], step = poll[1];
+        if(vis[id]) continue;
+        vis[id] = true;
+        for(int i = he[id]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if(dist[j] > dist[id] + w[i])
+            {
+                dist[j] = dist[id] + w[i];
+                q.add(new int[]{j, dist[j]});
+            }
+        }
+    }
+}
+
+class Edge{
+    int a, b, c;
+    public Edge(int _a, int _b, int _c){
+        a = _a; b = _b; c = _c;
+    }
+List<Edge> es = new ArrayList<>();
+//存图
+for(int[] t : ts)
+{
+    int a = t[0], b = t[1], c = t[2];
+    es.add(new Edge(a, b, c));
+}
+//适用于负权值
+void bellmanford()
+{
+    Arrays.fill(dist, INF);
+    dist[k] = 0;
+    //迭代n次
+    for(int p = 1; p <= n; p++)
+    {
+        int[] prev = dist.clone();
+        //使用上一次迭代结果，执行松弛操作
+        for(Edge e : es)
+        {
+            int a = e.a, b = e.b, c = e.c;
+            dist[b] = Math.min(dist[b], prev[a] + c);
+        }
+    }
+}
+    
+
+int[] he = new int[N], e = new int[M], ne = new int[M], w = new int[M];
+int[] dist = new int[N];
+boolean[] vis = new boolean[N];
+int idx;
+
+void spfa()
+{
+    Arrays.fill(vis, false);
+    Arrays.fill(dist, INF);
+    dist[k] = 0;
+    //存储标号k
+    Deque<Integer> d = new ArrayDeque<>();
+    d.addLast(k);
+    vis[k] = true; //标记已入队
+    while(!d.isEmpty())
+    {
+        int poll = d.pollFirst();
+        vis[poll] = true;
+        //尝试使用该点更新其他点的最短距离
+        //如果更新的点为入队则加入队列，标记
+        for(int i = he[poll]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if(dist[j] > dist[poll] + w[i])
+            {
+                dist[j] = dist[poll] + w[i];
+                if(vis[j]) continue;
+                d.addLast(j);
+                vis[j] = true;
+            }
+        }
+    }
+}
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        int[] indegeree = new int[numCourses]; // 入度表，指向该节点
+        List<List<Integer>> adj = new ArrayList<>(); // 邻接表
+        Deque<Integer> d = new ArrayDeque<>();
+
+        for(int i = 0; i < numCourses; i++) adj.add(new ArrayList<>());
+
+        //统计 tt[1] --> tt[0]
+        for(int[] tt : prerequisites)
+        {
+            indegeree[tt[0]]++;
+            adj.get(tt[1]).add(tt[0]);
+        }
+
+        //统计入度为0的节点
+        for(int i = 0; i < numCourses; i++)
+        {
+            if(indegeree[i] == 0) d.addLast(i);
+        }
+
+        //bfs
+        while(!d.isEmpty())
+        {
+            int poll = d.pollFirst();
+            numCourses--;
+            for(int num : adj.get(poll))
+            {
+                if(--indegeree[num] == 0) d.addLast(num);
+            }
+        }
+
+        return numCourses == 0;
+    }
+}
+
+12. 高精度
+● LC 43 字符串相乘，高精度乘法
+● LC 166 分数到小数，高精度除法
+public String multiply(String num1, String num2) {
+    int n = num1.length(), m = num2.length();
+    int[] cs = new int[n + m];
+
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            int a = num1.charAt(n - 1 - i) - '0', b = num2.charAt(m - 1 - j) - '0';
+            cs[i + j] += a * b; 
+        }
+    }
+
+    for(int i = 0, t = 0; i < cs.length; i++)
+    {
+        t += cs[i];
+        cs[i] = t % 10;
+        t /= 10;
+    }
+    int k = cs.length - 1;
+    while(k >= 0 && cs[k] == 0) k--;
+    if(k < 0) return "0";
+    StringBuilder sb = new StringBuilder();
+    while(k >= 0) sb.append(cs[k--]);
+    return sb.toString();
+}
+class Solution {
+    public String fractionToDecimal(int numerator, int denominator) {
+        // 防止溢出，转为long
+        long a = numerator, b = denominator;
+        if(a % b == 0) return String.valueOf(a / b);
+        StringBuilder sb = new StringBuilder();
+        // 有负数
+        if(a * b  < 0) sb.append('-');
+        a = Math.abs(a); b = Math.abs(b);
+
+        // 计算小数前面部分
+        sb.append(String.valueOf(a / b)).append('.');
+        a %= b;
+
+        // 记录余数
+        Map<Long, Integer> map = new HashMap<>();
+        while(a != 0)
+        {
+            // 记录当前余数在sb的位置
+            map.put(a, sb.length());
+            a *= 10;
+            sb.append(a / b);
+            a %= b;
+            // 如果余数出现过，说明是循环小数
+            if(map.containsKey(a))
+            {
+                int u = map.get(a);
+                return String.format("%s(%s)", sb.substring(0, u), sb.substring(u));
+            }
+        }
+        return sb.toString();
+    }
+}
+
+13.序列问题
+● LC 60 排列序列
+public String getPermutation(int n, int k) {
+    StringBuilder sb = new StringBuilder();
+    boolean[] vis = new boolean[10];
+
+    for(int i = 0; i < n; i++) // 枚举位置
+    {
+        // 当前位置i选定种类
+        int fact = 1;
+        for(int j = 1; j <= n - i - 1; j++) fact *= j;
+
+        for(int j = 1; j <= n; j++)
+        {
+            if(!vis[j])
+            {
+                if(fact < k) k -= fact;
+                else{
+                    sb.append(j);
+                    vis[j] = true;
+                    break;
+                }
+            }
+        }
+    }
+    return sb.toString();
+}
+
+14.技巧
+行n,列m
+二维(x, y) -> 一维idx
+idx = x * n + m;
+
+一维idx -> 二维(x,y)
+x = idx / m; y = idx % m;
+public List<List<Integer>> subsets(int[] nums) {
+    List<List<Integer>> ans = new ArrayList<>();
+    List<Integer> path = new ArrayList<>();
+    int n = nums.length;
+
+    // 二进制枚举[1, 2^n - 1]
+    for(int i = 0; i < 1 << n; i++)
+    {
+        for(int j = 0; j < n; j++) // 枚举每一位是0还是1
+        {
+            if((i >> j & 1) == 1) path.add(nums[j]);
+        }
+        ans.add(new ArrayList<>(path));
+        path.clear();
+    }
+    return ans;
+}
+// dp[i][j]表示 s[i~j]是否是回文串
+for(int j = 0; j < n; j++)
+{
+    for(int i = 0; i <= j; i++)
+    {
+        if(i == j) dp[i][j] = true;
+        else if(s.charAt(i) ==  s.charAt(j))
+        {
+            if(i + 1 > j - 1 || dp[i + 1][j - 1]) dp[i][j] = true;
+        }
+    }
+}
+s[i,j]的哈希值通过前缀和h[j] - h[i- 1] * p[j - i + 1]
+哈希数组h[], 次方数组p[]
+int P = 131, 1331;
+p[0] = 1;
+for(int i = 1; i <= n; i++)
+{
+    h[i] = h[i - 1] * P + s.charAt(i - 1);
+    p[i] = p[i - 1] * P;
+}
+
+int hash = h[j] - h[i- 1] * p[j - i + 1];
+int[] f = new int[n]; // 以f[i]为结尾的最大乘积
+int[] g = new int[n]; // 以g[i]为结尾的最小乘积
+class Solution {
+    public int majorityElement(int[] nums) {
+        int res = nums[0], cnt = 1;
+        for(int i = 1; i < nums.length; i++)
+        {
+            if(res == nums[i]) cnt++;
+            else if(--cnt == 0)
+            {
+                res = nums[i];
+                cnt = 1;
+            }
+        }
+        return res;
+    }
+}
+取出n的第k位
+n >> k & 1
+最后一位1
+lowbits(n) x & (~x + 1) -> x & -x（补码）
+
+2的幂
+n & (n - 1) == 0
+
+// 筛质数-线性筛法
+public int countPrimes(int n)
+{
+	boolean[] st = new boolean[n + 1];
+	List<Integer> primes = new ArrayList<>();
+	for(int i = 2; i < n; i++)
+	{
+		if(!st[i]) primes.add(i);
+		for(int j = 0; i * primes.get(j) < n; j++)
+		{
+			st[i * primes.get(j)] = true;
+			if(i % primes.get(j) == 0) break;
+		}
+	}
+	return primes.size();
+}
+public int quick_sort(int[] nums, int l, int r, int k)
+{
+    if(l == r) return nums[k];
+
+    int x = nums[l], i = l - 1, j = r + 1;
+    while(i < j){
+        do i++; while(nums[i] > x);
+        do j--; while(nums[j] < x);
+        if(i < j)
+        {
+            int temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+    }
+
+    if(k <= j) return quick_sort(nums, l, j, k);
+    else return quick_sort(nums, j + 1, r, k);
+}
+class Solution {
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+        int n = nums.length;
+        TreeSet<Long> ts = new TreeSet<>();
+        for(int i = 0; i < nums.length; i++)
+        {
+            Long u = nums[i] * 1L;
+            Long l = ts.floor(u); // 小于等于u最接近的数
+            Long r = ts.ceiling(u); // 大于等于u最接近的数
+            if(l != null && u - l <= t) return true;
+            if(r != null && r - u <= t) return true;
+            ts.add(u);
+
+            //维护窗口
+            if(i >= k) ts.remove(nums[i - k] * 1L);
+        }
+        return false;
+    }
+}
+// 一维线段交集
+[A,B], [C,D] 交集部分为max(0, min(B, D) - max(A,C))
+    
+// 二维面积交集
+坐标轴上投影 LC223. 矩形面积
+class Solution {
+    public int computeArea(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
+        int w = Math.max(0, Math.min(ax2, bx2) - Math.max(ax1, bx1));
+        int h = Math.max(0, Math.min(ay2, by2) - Math.max(ay1, by1));
+        return (ay2 - ay1) * (ax2 - ax1) + (by2 - by1) * (bx2 - bx1) - w * h;
+    }
+}
+class Solution {
+    Map<Character, Integer> map = new HashMap<>(){{
+        put('-', 1);
+        put('+', 1);
+        put('*', 2);
+        put('/', 2);
+        put('%', 2);
+        put('^', 3);
+    }};
+    public int calculate(String s) {
+        s = s.replaceAll(" ", "");
+        char[] cs = s.toCharArray();
+        int n = s.length();
+        Deque<Integer> nums = new ArrayDeque<>();
+        nums.addLast(0);
+        Deque<Character> ops = new ArrayDeque<>();
+        for (int i = 0; i < n; i++) {
+            char c = cs[i];
+            if (c == '(') {
+                ops.addLast(c);
+            } else if (c == ')') {
+                while (!ops.isEmpty()) {
+                    if (ops.peekLast() != '(') {
+                        calc(nums, ops);
+                    } else {
+                        ops.pollLast();
+                        break;
+                    }
+                }
+            } else {
+                if (isNumber(c)) {
+                    int u = 0;
+                    int j = i;
+                    while (j < n && isNumber(cs[j])) u = u * 10 + (cs[j++] - '0');
+                    nums.addLast(u);
+                    i = j - 1;
+                } else {
+                    if (i > 0 && (cs[i - 1] == '(' || cs[i - 1] == '+' || cs[i - 1] == '-')) {
+                        nums.addLast(0);
+                    }
+                    while (!ops.isEmpty() && ops.peekLast() != '(') {
+                        char prev = ops.peekLast();
+                        if (map.get(prev) >= map.get(c)) {
+                            calc(nums, ops);
+                        } else {
+                            break;
+                        }
+                    }
+                    ops.addLast(c);
+                }
+            }
+        }
+        while (!ops.isEmpty() && ops.peekLast() != '(') calc(nums, ops);
+        return nums.peekLast();
+    }
+    void calc(Deque<Integer> nums, Deque<Character> ops) {
+        if (nums.isEmpty() || nums.size() < 2) return;
+        if (ops.isEmpty()) return;
+        int b = nums.pollLast(), a = nums.pollLast();
+        char op = ops.pollLast();
+        int ans = 0;
+        if (op == '+') {
+            ans = a + b;
+        } else if (op == '-') {
+            ans = a - b;
+        } else if (op == '*') {
+            ans = a * b;
+        } else if (op == '/') {
+            ans = a / b;
+        } else if (op == '^') {
+            ans = (int)Math.pow(a, b);
+        } else if (op == '%') {
+            ans = a % b;
+        }
+        nums.addLast(ans);
+    }
+    boolean isNumber(char c) {
+        return Character.isDigit(c);
+    }
+}
+
+// LC 滑动窗口最大值
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int n = nums.length;
+        int[] ans = new int[n - k + 1];
+        // 单调队列
+        Deque<Integer> d = new ArrayDeque<>();
+        for(int i = 0; i < n; i++)
+        {
+            // 去除队尾小于等于当前元素nums[i],加入i
+            while(!d.isEmpty() && nums[i] >= nums[d.peekLast()]) d.pollLast();
+            d.addLast(i);
+            if(i < k - 1) continue;
+            // 队头元素下标已经不在滑动窗口
+            while(d.peekFirst() <= i - k) d.pollFirst();
+            ans[i - k + 1] = nums[d.peekFirst()];
+        }
+        return ans;
+    }
+}
+class NumArray {
+    int n;
+    int[] sum;
+    public NumArray(int[] nums) {
+        this.n = nums.length;
+        sum = new int[n + 1];
+        for(int i = 1; i <= n; i++) sum[i] = sum[i - 1] + nums[i - 1];
+    }
+    
+    public int sumRange(int left, int right) {
+        return sum[right + 1] - sum[left]; 
+    }
+}
+class NumMatrix {
+    int[][] sum;
+    public NumMatrix(int[][] matrix) {
+        int n = matrix.length, m = matrix[0].length;
+        sum = new int[n + 1][m + 1];
+
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = 1; j <= m; j++)
+            {
+                sum[i][j] = sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1] + matrix[i - 1][j - 1];
+            }
+        }
+    }
+    
+    public int sumRegion(int row1, int col1, int row2, int col2) {
+        return sum[row2 + 1][col2 + 1] - sum[row2 + 1][col1] - sum[row1][col2 + 1] + sum[row1][col1];
+    }
+}
+1.简单求区间和，用「前缀和」
+2.多次将某个区间变成同一个数，用「线段树」
+3.其他情况，用「树状数组」
+
+// 树状数组
+class BitTree{
+	int[] tree;
+	// 二进制位最后一位1
+	int lowbit(int x){
+		return x & -x;
+	}
+	// 查询前缀和的方法
+	int query(int x)
+	{
+		int ans = 0;
+		for(int i = x; i > 0; i -= lowbit(i)) ans += tree[i];
+		return ans;
+	}
+	
+	// 在树状数组x位置增加值u
+	void add(int x, int u)
+	{
+		for(int i = x; i <= n; i += lowbit(i)) tree[i] += u;
+	}
+	
+	// 初始化树状数组，从1开始
+	for(int i = 0; i < n; i++) add(i + 1, nums[i]);
+	
+	// 使用树状数组
+	void update(int i, int val)
+	{
+		add(i + 1, val - nums[i]);
+		nums[i] = val;
+	}
+}
+
+15.数据设计
+● LC146，LRU缓存
+● LC155，最小栈
+● LC173， 二叉搜索树迭代器
+● LC 295，数据流中的中位数，对顶堆
+● LC 297， 二叉树序列化与反序列化，bfs
+class LRUCache {
+    // 定义双向链表
+    class Node{
+        int key, val;
+        Node left, right;
+        Node(int k, int v)
+        {
+            key = k; val = v;
+        }
+    }
+
+    int n;
+    Node head, tail;
+    Map<Integer, Node> map;
+    public LRUCache(int capacity) {
+        n = capacity;
+        map = new HashMap<>();
+        head = new Node(-1, -1);
+        tail = new Node(-1, -1);
+        head.right = tail;
+        tail.left = head;
+    }
+    
+    public int get(int key) {
+        // 如果哈希表中存在则取出，将节点放在双链表头
+        if(map.containsKey(key))
+        {
+            Node node = map.get(key);
+            refresh(node);
+            return node.val;
+        }
+        return -1;
+    }
+    
+    public void put(int key, int value) {
+        Node node = null;
+        if(map.containsKey(key)) // 如果哈希表存在，则更新值，将node放在双链表头
+        {
+            node = map.get(key);
+            node.val = value;
+        }
+        else{
+            // 如果容量已经已经满，删除双链表尾部节点
+            if(map.size() == n)
+            {
+                Node del = tail.left;
+                map.remove(del.key);
+                delete(del);
+            }
+            node = new Node(key, value);
+            map.put(key, node);
+        }
+        refresh(node);
+    }
+
+    // 刷新, 将该节点删除，插入双链表头部
+    public void refresh(Node node)
+    {
+        delete(node);
+        node.right = head.right;
+        node.left = head;
+        head.right.left = node;
+        head.right = node;
+    }
+
+    // 删除节点
+    public void delete(Node node)
+    {
+        if(node.left != null)
+        {
+            Node left = node.left;
+            left.right = node.right;
+            node.right.left = left;
+        }
+    }
+}
+class MinStack {
+    private Deque<Integer> stack;
+    private Deque<Integer> minstack;
+    public MinStack() {
+        stack = new ArrayDeque<>();
+        minstack = new ArrayDeque<>();
+    }
+    
+    public void push(int val) {
+        if(minstack.isEmpty() || val <= minstack.peekLast()) minstack.addLast(val);
+        stack.addLast(val);
+    }
+    
+    public void pop() {
+        int val = stack.pollLast();
+        if(val == getMin()) minstack.pollLast();
+    }
+    
+    public int top() {
+        return stack.peekLast();
+    }
+    
+    public int getMin() {
+        return minstack.peekLast();
+    }
+}
+class BSTIterator {
+
+    Deque<TreeNode> d = new ArrayDeque<>();
+    public BSTIterator(TreeNode root) {
+        dfsLeft(root);
+    }
+    
+    public int next() {
+        TreeNode root = d.pollLast();
+        int res = root.val;
+        
+        root = root.right;
+        dfsLeft(root);
+        return res;
+    }
+    
+    public boolean hasNext() {
+        return !d.isEmpty();
+    }
+
+    void dfsLeft(TreeNode root)
+    {
+        while(root != null)
+        {
+            d.addLast(root);
+            root = root.left;
+        }
+    }
+}
+class WordDictionary {
+    class TrieNode{
+        boolean end;
+        TrieNode[] tns = new TrieNode[26];
+    }
+
+    TrieNode root;
+    public WordDictionary() {
+        root = new TrieNode();
+    }
+    
+    public void addWord(String word) {
+        TrieNode p = root;
+        for(int i = 0; i < word.length(); i++)
+        {
+            int u = word.charAt(i) - 'a';
+            if(p.tns[u] == null) p.tns[u] = new TrieNode();
+            p = p.tns[u];
+        }
+        p.end = true;
+    }
+    
+    public boolean search(String word) {
+        return dfs(word, root, 0);
+    }
+
+    public boolean dfs(String s, TrieNode p, int u)
+    {
+        if(u == s.length()) return p.end;
+        char c = s.charAt(u);
+        if(c == '.')
+        {
+            for(int j = 0; j < 26; j++)
+            {
+                if(p.tns[j] != null && dfs(s, p.tns[j], u + 1)) return true;
+            }
+            return false;
+        }
+        else{
+            int t = c - 'a';
+            if(p.tns[t] == null) return false;
+            return dfs(s, p.tns[t], u + 1);
+        }
+    }
+}
+class MyStack {
+    Deque<Integer> queue;
+    Deque<Integer> buffer;
+    public MyStack() {
+        queue = new ArrayDeque<>();
+        buffer = new ArrayDeque<>();
+    }
+    
+    public void push(int x) {
+        queue.addLast(x);
+    }
+    
+    public int pop() {
+        while(queue.size() > 1)
+        {
+            buffer.addLast(queue.pollFirst());
+        }
+        int val =  queue.pollFirst();
+        while(!buffer.isEmpty()) queue.addLast(buffer.pollFirst());
+        return val;
+    }
+    
+    public int top() {
+        while(queue.size() > 1) buffer.addLast(queue.pollFirst());
+        int val = queue.pollFirst();
+        buffer.addLast(val);
+        while(!buffer.isEmpty()) queue.addLast(buffer.pollFirst());
+        return val;
+    }
+    
+    public boolean empty() {
+        return queue.isEmpty();
+    }
+}
+class MyQueue {
+    Deque<Integer> q;
+    Deque<Integer> buffer;
+    public MyQueue() {
+        q = new ArrayDeque<>();
+        buffer = new ArrayDeque<>();
+    }
+    
+    public void push(int x) {
+        q.addLast(x);
+    }
+    
+    public int pop() {
+        // 如果栈中元素大于1，加入buffer
+        while(!q.isEmpty() && q.size() > 1) buffer.addLast(q.pollLast());
+        int val = q.pollLast();
+        while(!buffer.isEmpty()) q.addLast(buffer.pollLast());
+        return val;
+    }
+    
+    public int peek() {
+        while(!q.isEmpty() && q.size() > 1) buffer.addLast(q.pollLast());
+        int val = q.peekLast();
+        while(!buffer.isEmpty()) q.addLast(buffer.pollLast());
+        return val;
+    }
+    
+    public boolean empty() {
+        return q.isEmpty();
+    }
+}
+class MedianFinder {
+    PriorityQueue<Integer> left; //大根堆
+    PriorityQueue<Integer> right; //小根堆
+    public MedianFinder() {
+        left = new PriorityQueue<>((x, y) -> y - x);
+        right = new PriorityQueue<>((x, y) -> x - y);
+    }
+    
+    public void addNum(int num) {
+        // 保持left元素大于right元素1
+        int s1 = left.size(), s2 = right.size();
+        if(s1 == s2)
+        {
+            // 如果都为空或者当前num小于右边堆顶
+            if(right.isEmpty() || num <= right.peek()) left.add(num);
+            //不为空，num大于右边堆顶，right弹出一个元素加入left
+            else{
+                left.add(right.poll());
+                right.add(num);
+            }
+        }
+        else{
+            // 如果当前元素大于左边堆顶，直接加入right
+            if(num >= left.peek()) right.add(num);
+            else{
+                // 当前元素小于left堆顶，弹出left堆顶
+                right.add(left.poll());
+                left.add(num);
+            }
+        }
+
+    }
+    
+    public double findMedian() {
+        int sum = left.size() + right.size();
+        if(sum % 2 == 1) return left.peek();
+        return (left.peek() + right.peek()) / 2.0;
+    }
+}
+
+public class Codec {
+    TreeNode tmp = new TreeNode(-10000); // 设置虚拟节点（代替空节点）
+    List<String> list = new ArrayList<>();
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        // BFS
+        Deque<TreeNode> d = new ArrayDeque<>();
+        if(root == null) return "";
+        d.addLast(root);
+
+        while(!d.isEmpty())
+        {
+            TreeNode cur = d.pollFirst();
+            list.add(cur.val + "");
+            if(!cur.equals(tmp))
+            {
+                if(cur.left != null) d.addLast(cur.left);
+                else d.addLast(tmp);
+                if(cur.right != null) d.addLast(cur.right);
+                else d.addLast(tmp);
+            }
+        }
+        return String.join(",", list);
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if(data.equals("")) return null;
+        String[] ss = data.split(",");
+        int n = ss.length;
+        TreeNode root = new TreeNode(Integer.parseInt(ss[0]));
+        Deque<TreeNode> d = new ArrayDeque<>();
+        d.addLast(root);
+
+        for(int i = 1; i < n - 1; i += 2)
+        {
+            TreeNode poll = d.pollFirst();
+            int a = Integer.parseInt(ss[i]), b = Integer.parseInt(ss[i + 1]);
+            if(a != tmp.val)
+            {
+                poll.left = new TreeNode(a);
+                d.addLast(poll.left);
+            }
+
+            if(b != tmp.val)
+            {
+                poll.right = new TreeNode(b);
+                d.addLast(poll.right);
+            }
+        }
+        return root;
+    }
+}
